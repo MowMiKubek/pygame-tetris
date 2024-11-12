@@ -53,7 +53,7 @@ COLORS = [
     (0, 255, 255),  # I
     (128, 0, 128),  # T
     (255, 165, 0),  # L
-    (0, 0, 255),    # J
+    (0, 0, 255),  # J
     (255, 255, 0),  # O
 ]
 
@@ -66,14 +66,16 @@ class Tetromino:
         self.y = 0
         self.rotation = 0
 
+    def rotate(self):
+        self.shape = [list(row) for row in zip(*self.shape[::-1])]
+
 
 def draw_grid(surface, grid):
     for y in range(GRID_HEIGHT):
         for x in range(GRID_WIDTH):
             if grid[y][x] != 0:
                 pygame.draw.rect(surface, grid[y][x], (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
-            # pygame.draw.rect(surface, WHITE, (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 1)
-
+            pygame.draw.rect(surface, WHITE, (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 1)
 
 
 def draw_tetromino(surface, tetromino):
@@ -81,15 +83,14 @@ def draw_tetromino(surface, tetromino):
         for x, cell in enumerate(row):
             if cell != 0:
                 pygame.draw.rect(surface, tetromino.color,
-                                 ((tetromino.x + x) * BLOCK_SIZE, (tetromino.y + y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+                                 ((tetromino.x + x) * BLOCK_SIZE, (tetromino.y + y) * BLOCK_SIZE, BLOCK_SIZE,
+                                  BLOCK_SIZE))
 
 
 grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
-
 running = True
 current_tetromino = Tetromino()
-
 
 while running:
     screen.fill(BLACK)
@@ -102,6 +103,12 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
                 current_tetromino.y += 1
+            if event.key == pygame.K_LEFT:
+                current_tetromino.x -= 1
+            if event.key == pygame.K_RIGHT:
+                current_tetromino.x += 1
+            if event.key == pygame.K_UP:
+                current_tetromino.rotate()
 
     draw_grid(screen, grid)
     draw_tetromino(screen, current_tetromino)
