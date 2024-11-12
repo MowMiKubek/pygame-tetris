@@ -70,6 +70,17 @@ class Tetromino:
         self.shape = [list(row) for row in zip(*self.shape[::-1])]
 
 
+def valid_move(shape, grid, offset):
+    off_x, off_y = offset
+    for y, row in enumerate(shape):
+        for x, cell in enumerate(row):
+            if cell != 0:
+                if x + off_x < 0 or x + off_x >= GRID_WIDTH or y + off_y >= GRID_HEIGHT:
+                    return False
+                if grid[y + off_y][x + off_x] != 0:
+                    return False
+    return True
+
 def draw_grid(surface, grid):
     for y in range(GRID_HEIGHT):
         for x in range(GRID_WIDTH):
@@ -118,9 +129,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
                 current_tetromino.y += 1
-            if event.key == pygame.K_LEFT:
+            if event.key == pygame.K_LEFT and valid_move(current_tetromino.shape, grid, (current_tetromino.x - 1, current_tetromino.y)):
                 current_tetromino.x -= 1
-            if event.key == pygame.K_RIGHT:
+            if event.key == pygame.K_RIGHT and valid_move(current_tetromino.shape, grid, (current_tetromino.x + 1, current_tetromino.y)):
                 current_tetromino.x += 1
             if event.key == pygame.K_UP:
                 current_tetromino.rotate()
