@@ -97,6 +97,12 @@ def draw_tetromino(surface, tetromino):
                                  ((tetromino.x + x) * BLOCK_SIZE, (tetromino.y + y) * BLOCK_SIZE, BLOCK_SIZE,
                                   BLOCK_SIZE))
 
+def clear_lines(grid):
+    new_grid = [row for row in grid if any(cell == 0 for cell in row)] # 111101 - keep it; 111111 - discard it
+    lines_removed = GRID_HEIGHT - len(new_grid)
+    new_grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(lines_removed)] + new_grid
+    return new_grid
+
 
 grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
@@ -120,8 +126,9 @@ while running:
                 for x, cell in enumerate(row):
                     if cell != 0:
                         grid[current_tetromino.y + y][current_tetromino.x + x] = current_tetromino.color
+            grid = clear_lines(grid)
+            # score += 1
             current_tetromino = Tetromino()
-            # continue
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
