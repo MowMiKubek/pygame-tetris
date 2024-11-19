@@ -113,21 +113,21 @@ while running:
 
     if fall_time >= fall_speed:
         fall_time = 0
-        if current_tetromino.y + len(current_tetromino.shape) + 1 > GRID_HEIGHT:
+        if valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
+            current_tetromino.y += 1
+        else:
             for y, row in enumerate(current_tetromino.shape):
                 for x, cell in enumerate(row):
                     if cell != 0:
                         grid[current_tetromino.y + y][current_tetromino.x + x] = current_tetromino.color
             current_tetromino = Tetromino()
-        else:
-            current_tetromino.y += 1
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
             pygame.quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN and valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
                 current_tetromino.y += 1
             if event.key == pygame.K_LEFT and valid_move(current_tetromino.shape, grid, (current_tetromino.x - 1, current_tetromino.y)):
                 current_tetromino.x -= 1
@@ -135,6 +135,9 @@ while running:
                 current_tetromino.x += 1
             if event.key == pygame.K_UP:
                 current_tetromino.rotate()
+
+    # check if move is valid
+    # revert if not
 
     draw_grid(screen, grid)
     draw_tetromino(screen, current_tetromino)
