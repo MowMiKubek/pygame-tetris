@@ -1,5 +1,5 @@
 import random
-
+from copy import deepcopy
 import pygame
 
 pygame.init()
@@ -121,6 +121,7 @@ while running:
                     if cell != 0:
                         grid[current_tetromino.y + y][current_tetromino.x + x] = current_tetromino.color
             current_tetromino = Tetromino()
+            # continue
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -134,10 +135,10 @@ while running:
             if event.key == pygame.K_RIGHT and valid_move(current_tetromino.shape, grid, (current_tetromino.x + 1, current_tetromino.y)):
                 current_tetromino.x += 1
             if event.key == pygame.K_UP:
+                backup_tetromino = deepcopy(current_tetromino)
                 current_tetromino.rotate()
-
-    # check if move is valid
-    # revert if not
+                if not valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y)):
+                    current_tetromino = backup_tetromino
 
     draw_grid(screen, grid)
     draw_tetromino(screen, current_tetromino)
