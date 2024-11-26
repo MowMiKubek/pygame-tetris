@@ -115,10 +115,20 @@ def check_if_game_over(grid, tetromino):
     return True
 
 
+def place_ghost(grid, tetromino):
+    while valid_move(tetromino.shape, grid, (tetromino.x, tetromino.y + 1)):
+        tetromino.y += 1
+    tetromino.color = (40, 40, 40)
+    return tetromino
+
+
 grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
 running = True
 current_tetromino = Tetromino()
+ghost_tetromino = deepcopy(current_tetromino)
+ghost_tetromino.color = (20, 20, 20)
+ghost_tetromino = place_ghost(grid, ghost_tetromino)
 
 fall_speed = 500
 fall_time = 0
@@ -177,8 +187,13 @@ while running:
                 if not valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y)):
                     current_tetromino = backup_tetromino
 
+    ghost_tetromino = deepcopy(current_tetromino)
+    ghost_tetromino = place_ghost(grid, ghost_tetromino)
+
     draw_grid(screen, grid)
+    draw_tetromino(screen, ghost_tetromino)
     draw_tetromino(screen, current_tetromino)
+
 
     text_score = score_font.render(f"Score: {game_score}", True, (255, 255, 255))
     text_rect = text_score.get_rect(topleft=(0, 0))
@@ -193,6 +208,10 @@ while True:
             running = False
             pygame.quit()
 
-    clock.tick()
+    font_game_over = pygame.font.SysFont("Comic Sans MS", 50)
+    text_game_over = font_game_over.render(f"Game Over", True, (255, 0, 0))
+    text_rect = text_game_over.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+    screen.blit(text_game_over, text_rect)
 
+    clock.tick()
     pygame.display.flip()
