@@ -105,6 +105,13 @@ def clear_lines(grid):
     new_grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(lines_removed)] + new_grid
     return new_grid, lines_removed
 
+def check_if_game_over(grid, tetromino):
+    for y, row in enumerate(tetromino.shape):
+        for x, cell in enumerate(row):
+            if grid[y][x + tetromino.x] != 0 and tetromino.shape[y][x] != 0:
+                return False
+    return True
+
 
 grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
@@ -138,6 +145,7 @@ while running:
                     if cell != 0:
                         grid[current_tetromino.y + y][current_tetromino.x + x] = current_tetromino.color
             grid, lines = clear_lines(grid)
+            print(lines)
             if lines == 1:
                 game_score += 40
             elif lines == 2:
@@ -147,6 +155,8 @@ while running:
             elif lines == 4:
                 game_score += 1200
             current_tetromino = Tetromino()
+            if not check_if_game_over(grid, current_tetromino):
+                running = False
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -172,5 +182,15 @@ while running:
     text_rect = text_score.get_rect(topleft=(0, 0))
 
     screen.blit(text_score, text_rect)
+
+    pygame.display.flip()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+
+    clock.tick()
 
     pygame.display.flip()
