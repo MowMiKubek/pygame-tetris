@@ -14,6 +14,8 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+score_font = pygame.font.SysFont('Arial', 36)
+
 # grid = [
 #     [0, 0, 0, 0],
 #     [0, 0, 0, 0],
@@ -86,7 +88,7 @@ def draw_grid(surface, grid):
         for x in range(GRID_WIDTH):
             if grid[y][x] != 0:
                 pygame.draw.rect(surface, grid[y][x], (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
-            pygame.draw.rect(surface, WHITE, (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 1)
+            # pygame.draw.rect(surface, WHITE, (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 1)
 
 
 def draw_tetromino(surface, tetromino):
@@ -101,7 +103,7 @@ def clear_lines(grid):
     new_grid = [row for row in grid if any(cell == 0 for cell in row)] # 111101 - keep it; 111111 - discard it
     lines_removed = GRID_HEIGHT - len(new_grid)
     new_grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(lines_removed)] + new_grid
-    return new_grid
+    return new_grid, lines_removed
 
 
 grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
@@ -111,6 +113,15 @@ current_tetromino = Tetromino()
 
 fall_speed = 500
 fall_time = 0
+
+"""
+    1 line - 40p
+    2 line - 100p
+    3 line - 300p
+    4 line - 1200p
+"""
+
+game_score = 0
 
 while running:
     screen.fill(BLACK)
@@ -126,8 +137,15 @@ while running:
                 for x, cell in enumerate(row):
                     if cell != 0:
                         grid[current_tetromino.y + y][current_tetromino.x + x] = current_tetromino.color
-            grid = clear_lines(grid)
-            # score += 1
+            grid, lines = clear_lines(grid)
+            if lines == 1:
+                game_score += 40
+            elif lines == 2:
+                game_score += 100
+            elif lines == 3:
+                game_score += 300
+            elif lines == 4:
+                game_score += 1200
             current_tetromino = Tetromino()
 
     for event in pygame.event.get():
@@ -149,4 +167,10 @@ while running:
 
     draw_grid(screen, grid)
     draw_tetromino(screen, current_tetromino)
+
+    text_score = score_font.render(f"Score: {game_score}", True, (255, 255, 255))
+    text_rect = text_score.get_rect(topleft=(0, 0))
+
+    screen.blit(text_score, text_rect)
+
     pygame.display.flip()
