@@ -5,11 +5,15 @@ import pygame
 pygame.init()
 clock = pygame.time.Clock()
 
-SCREEN_WIDTH, SCREEN_HEIGHT = 300, 600
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT = 300, 600
 GRID_WIDTH, GRID_HEIGHT = 10, 20
 BLOCK_SIZE = 30
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+game_screen = pygame.Surface((GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT))
+
+
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -63,8 +67,8 @@ COLORS = [
 
 
 class Tetromino:
-    def __init__(self):
-        self.shape = random.choice(tetrominoes)
+    def __init__(self, forbidden_shape=None):
+        self.shape = random.choice(list(filter(lambda elem: elem != forbidden_shape, tetrominoes)))
         self.color = random.choice(COLORS)
         self.x = GRID_WIDTH // 2 - len(self.shape[0]) // 2
         self.y = 0
@@ -121,11 +125,21 @@ def place_ghost(grid, tetromino):
     tetromino.color = (40, 40, 40)
     return tetromino
 
+def draw_next_tetromino(surface, tetromino, location):
+    x_loc, y_loc = location
+    for y, row in enumerate(tetromino.shape):
+        for x, cell in enumerate(row):
+            if cell != 0:
+                pygame.draw.rect(surface, tetromino.color,
+                                 ((x_loc + x) * BLOCK_SIZE, (y_loc + y) * BLOCK_SIZE, BLOCK_SIZE,
+                                  BLOCK_SIZE))
+
 
 grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
 running = True
 current_tetromino = Tetromino()
+next_tetromino = Tetromino(current_tetromino.shape)
 ghost_tetromino = deepcopy(current_tetromino)
 ghost_tetromino.color = (20, 20, 20)
 ghost_tetromino = place_ghost(grid, ghost_tetromino)
@@ -143,7 +157,7 @@ fall_time = 0
 game_score = 0
 
 while running:
-    screen.fill(BLACK)
+    game_screen.fill(BLACK)
     fall_time += clock.get_rawtime()
     clock.tick()
 
@@ -166,7 +180,8 @@ while running:
                 game_score += 300
             elif lines == 4:
                 game_score += 1200
-            current_tetromino = Tetromino()
+            current_tetromino = next_tetromino
+            next_tetromino = Tetromino(current_tetromino.shape)
             if not check_if_game_over(grid, current_tetromino):
                 running = False
 
@@ -190,15 +205,20 @@ while running:
     ghost_tetromino = deepcopy(current_tetromino)
     ghost_tetromino = place_ghost(grid, ghost_tetromino)
 
-    draw_grid(screen, grid)
-    draw_tetromino(screen, ghost_tetromino)
-    draw_tetromino(screen, current_tetromino)
+    draw_grid(game_screen, grid)
+    draw_tetromino(game_screen, ghost_tetromino)
+    draw_tetromino(game_screen, current_tetromino)
 
 
     text_score = score_font.render(f"Score: {game_score}", True, (255, 255, 255))
     text_rect = text_score.get_rect(topleft=(0, 0))
 
-    screen.blit(text_score, text_rect)
+    game_screen.blit(text_score, text_rect)
+
+    window.fill((20, 20, 20))
+    draw_next_tetromino(window, next_tetromino, (20, 5))
+    window.blit(game_screen, ((SCREEN_WIDTH - GAME_SCREEN_WIDTH) // 2, 0))
+
 
     pygame.display.flip()
 
@@ -210,8 +230,8 @@ while True:
 
     font_game_over = pygame.font.SysFont("Comic Sans MS", 50)
     text_game_over = font_game_over.render(f"Game Over", True, (255, 0, 0))
-    text_rect = text_game_over.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-    screen.blit(text_game_over, text_rect)
+    text_rect = text_game_over.get_rect(center=(GAME_SCREEN_WIDTH // 2, GAME_SCREEN_HEIGHT // 2))
+    game_screen.blit(text_game_over, text_rect)
 
     clock.tick()
     pygame.display.flip()
