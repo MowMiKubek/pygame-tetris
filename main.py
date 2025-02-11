@@ -134,6 +134,10 @@ def draw_next_tetromino(surface, tetromino, location):
                                  ((x_loc + x) * BLOCK_SIZE, (y_loc + y) * BLOCK_SIZE, BLOCK_SIZE,
                                   BLOCK_SIZE))
 
+def split(text):
+    separator_idx = text.find(':')
+    return text[:separator_idx], text[separator_idx+1:]
+
 
 grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
@@ -270,6 +274,13 @@ while True:
             if event.key == pygame.K_RETURN:
                 with open("leaderboard.txt", "a") as file:
                     file.write(f"{player_name}:{game_score}\n")
+                with open("leaderboard.txt", "r") as file:
+                    lines = file.readlines()
+                    lines = [line[:-1] if line.endswith('\n') else line for line in lines]
+                    lines = [split(line) for line in lines]
+                    lines = sorted(lines, key=lambda data: data[1], reverse=True)
+                    for line in lines:
+                        print(f"Player name: {line[0]}, scored {line[1]} points")
                     exit(0)
             if pygame.K_a <= event.key <= pygame.K_z:
                 player_name = player_name + chr(event.key).upper()
