@@ -161,6 +161,15 @@ while running:
     fall_time += clock.get_rawtime()
     clock.tick()
 
+    if game_score < 1000:
+        fall_speed = 500
+    elif 1000 <= game_score < 2000:
+        fall_speed = 400
+    elif 2000 <= game_score < 3000:
+        fall_speed = 300
+    else:
+        fall_speed = 200
+
     if fall_time >= fall_speed:
         fall_time = 0
         if valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
@@ -190,8 +199,9 @@ while running:
             running = False
             pygame.quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN and valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
-                current_tetromino.y += 1
+            if event.key == pygame.K_DOWN:
+                while valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
+                    current_tetromino.y += 1
             if event.key == pygame.K_LEFT and valid_move(current_tetromino.shape, grid, (current_tetromino.x - 1, current_tetromino.y)):
                 current_tetromino.x -= 1
             if event.key == pygame.K_RIGHT and valid_move(current_tetromino.shape, grid, (current_tetromino.x + 1, current_tetromino.y)):
