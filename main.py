@@ -234,16 +234,45 @@ while running:
 
     pygame.display.flip()
 
+
+player_name = "PLAYER"
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
             pygame.quit()
 
+    window.fill((20, 20, 20))
+    window.blit(game_screen, ((SCREEN_WIDTH - GAME_SCREEN_WIDTH) // 2, 0))
+
     font_game_over = pygame.font.SysFont("Comic Sans MS", 50)
+    font_player = pygame.font.SysFont("Comic Sans MS", 30)
+
     text_game_over = font_game_over.render(f"Game Over", True, (255, 0, 0))
     text_rect = text_game_over.get_rect(center=(GAME_SCREEN_WIDTH // 2, GAME_SCREEN_HEIGHT // 2))
-    game_screen.blit(text_game_over, text_rect)
+    window.blit(text_game_over, text_rect)
+
+    text_player = font_player.render(f"Your name:", True, (255, 255, 255))
+    text_rect = text_game_over.get_rect(center=(GAME_SCREEN_WIDTH // 2, GAME_SCREEN_HEIGHT // 2 + 75))
+    window.blit(text_player, text_rect)
+
+    text_player = font_player.render(f"{player_name}", True, (255, 255, 255))
+    text_rect = text_game_over.get_rect(center=(GAME_SCREEN_WIDTH // 2, GAME_SCREEN_HEIGHT // 2 + 150))
+    window.blit(text_player, text_rect)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_BACKSPACE:
+                player_name = player_name[:-1]
+            if event.key == pygame.K_RETURN:
+                with open("leaderboard.txt", "a") as file:
+                    file.write(f"{player_name}:{game_score}\n")
+                    exit(0)
+            if pygame.K_a <= event.key <= pygame.K_z:
+                player_name = player_name + chr(event.key).upper()
 
     clock.tick()
     pygame.display.flip()
