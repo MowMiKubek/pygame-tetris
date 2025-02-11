@@ -199,7 +199,9 @@ while running:
             running = False
             pygame.quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN and valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
+                current_tetromino.y += 1
+            if event.key == pygame.K_SPACE:
                 while valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
                     current_tetromino.y += 1
             if event.key == pygame.K_LEFT and valid_move(current_tetromino.shape, grid, (current_tetromino.x - 1, current_tetromino.y)):
