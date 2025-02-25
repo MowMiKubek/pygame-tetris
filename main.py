@@ -239,8 +239,12 @@ while running:
     pygame.display.flip()
 
 
+lines = []
+places = []
+
 player_name = "PLAYER"
-while True:
+SCORE_ENTER = True
+while SCORE_ENTER:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -278,12 +282,56 @@ while True:
                     lines = file.readlines()
                     lines = [line[:-1] if line.endswith('\n') else line for line in lines]
                     lines = [split(line) for line in lines]
-                    lines = sorted(lines, key=lambda data: data[1], reverse=True)
-                    for line in lines:
-                        print(f"Player name: {line[0]}, scored {line[1]} points")
-                    exit(0)
+                    lines = sorted(lines, key=lambda data: int(data[1]), reverse=True)
+                    places = [1] * len(lines)
+                    for i in range(1, len(lines)):
+                        if lines[i][1] == lines[i-1][1]:
+                            places[i] = places[i-1]
+                        else:
+                            places[i] = i + 1
+                    for i, line in enumerate(lines):
+                        print(f"{places[i]}. Player name: {line[0]}, scored {line[1]} points")
+                SCORE_ENTER = False
+                print("Score enter", SCORE_ENTER)
             if pygame.K_a <= event.key <= pygame.K_z:
                 player_name = player_name + chr(event.key).upper()
+
+    clock.tick()
+    pygame.display.flip()
+
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+
+    window.fill((20, 20, 20))
+    window.blit(game_screen, ((SCREEN_WIDTH - GAME_SCREEN_WIDTH) // 2, 0))
+
+    font_game_over = pygame.font.SysFont("Comic Sans MS", 50)
+    font_player = pygame.font.SysFont("Comic Sans MS", 30)
+
+    text_game_over = font_game_over.render(f"Leaderboard", True, (255, 0, 0))
+    text_rect = text_game_over.get_rect(center=(GAME_SCREEN_WIDTH // 2, GAME_SCREEN_HEIGHT // 2))
+    window.blit(text_game_over, text_rect)
+
+    for i in range(3):
+        text_player = font_player.render(f"{places[i]}. {lines[i][0]}: {lines[i][1]}", True, (255, 255, 255))
+        text_rect = text_game_over.get_rect(center=(GAME_SCREEN_WIDTH // 2, GAME_SCREEN_HEIGHT // 2 + 75 + 30*i))
+        window.blit(text_player, text_rect)
+
+    index = 0
+    for i, line in enumerate(lines):
+        score = int(line[1])
+        if game_score == score:
+            index = i
+            break
+
+    if index >= 3:
+        text_player = font_player.render(f"{places[index]}. {lines[index][0]}: {lines[index][1]}", True, (255, 255, 255))
+        text_rect = text_game_over.get_rect(center=(GAME_SCREEN_WIDTH // 2, GAME_SCREEN_HEIGHT // 2 + 210))
+        window.blit(text_player, text_rect)
 
     clock.tick()
     pygame.display.flip()
