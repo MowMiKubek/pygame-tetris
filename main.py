@@ -84,6 +84,21 @@ fall_time = 0
     4 line - 1200p
 """
 
+DIFF_LEVELS = {
+    "EASY": {
+        "speed": [500, 500, 400, 350]
+    },
+    "MEDIUM": {
+        "speed": [500, 400, 300, 200]
+    },
+    "HARD": {
+        "speed": [300, 300, 200, 200],
+    }
+}
+
+diff_level = "MEDIUM"
+diff_settings = DIFF_LEVELS[diff_level]
+
 game_score = 0
 
 while running:
@@ -92,13 +107,13 @@ while running:
     clock.tick()
 
     if game_score < 1000:
-        fall_speed = 500
+        fall_speed = diff_settings["speed"][0]
     elif 1000 <= game_score < 2000:
-        fall_speed = 400
+        fall_speed = diff_settings["speed"][1]
     elif 2000 <= game_score < 3000:
-        fall_speed = 300
+        fall_speed = diff_settings["speed"][2]
     else:
-        fall_speed = 200
+        fall_speed = diff_settings["speed"][3]
 
     if fall_time >= fall_speed:
         fall_time = 0
