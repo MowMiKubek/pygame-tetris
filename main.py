@@ -89,15 +89,31 @@ DIFF_LEVELS = {
         "speed": [500, 500, 400, 350]
     },
     "MEDIUM": {
-        "speed": [500, 400, 300, 200]
+        "speed": [500, 400, 300, 200],
+        "show_hint": False
     },
     "HARD": {
         "speed": [300, 300, 200, 200],
+        "bonus_tetrominos": [
+            [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+        ]
     }
 }
 
 diff_level = "MEDIUM"
+
+# set game speed
 diff_settings = DIFF_LEVELS[diff_level]
+
+# set bonus tetrominos
+if "bonus_tetrominos" in DIFF_LEVELS[diff_level].keys():
+    for tetromino in DIFF_LEVELS[diff_level]["bonus_tetrominos"]:
+        Tetromino.Tetromino.tetrominoes.append(tetromino)
+
+# set hint
+show_hint = True
+if "show_hint" in DIFF_LEVELS[diff_level].keys() and DIFF_LEVELS[diff_level]["show_hint"] == False:
+    show_hint = False
 
 game_score = 0
 
@@ -172,7 +188,8 @@ while running:
     game_screen.blit(text_score, text_rect)
 
     window.fill((20, 20, 20))
-    draw_next_tetromino(window, next_tetromino, (20, 5))
+    if show_hint:
+        draw_next_tetromino(window, next_tetromino, (20, 5))
     window.blit(game_screen, ((constants.SCREEN_WIDTH - constants.GAME_SCREEN_WIDTH) // 2, 0))
 
     pygame.display.flip()
