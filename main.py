@@ -2,6 +2,7 @@ from copy import deepcopy
 import pygame
 import util.constants as constants
 import util.Tetromino as Tetromino
+import yaml
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -84,23 +85,42 @@ fall_time = 0
     4 line - 1200p
 """
 
-DIFF_LEVELS = {
-    "EASY": {
-        "speed": [500, 500, 400, 350]
-    },
-    "MEDIUM": {
-        "speed": [500, 400, 300, 200],
-        "show_hint": False
-    },
-    "HARD": {
-        "speed": [300, 300, 200, 200],
-        "bonus_tetrominos": [
-            [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
-        ]
+DEFAULT_DIFF_LEVELS = {
+    "INITIAL_LEVEL": 2,
+    "DIFF_LEVELS": {
+        "EASY": {
+            "speed": [500, 500, 400, 350]
+        },
+        "MEDIUM": {
+            "speed": [500, 400, 300, 200],
+            "show_hint": False
+        },
+        "HARD": {
+            "speed": [300, 300, 200, 200],
+            "bonus_tetrominos": [
+                [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+            ]
+        }
     }
 }
 
-selected_level = 2
+
+def read_yaml_file(file_path):
+    try:
+        with open(file_path, "r") as file:
+            data = yaml.safe_load(file)
+        return data
+    except:
+        with open(file_path, "w") as file:
+            yaml.dump(DEFAULT_DIFF_LEVELS, file, default_flow_style=False)
+        return DEFAULT_DIFF_LEVELS
+
+
+
+
+settings = read_yaml_file("settings/settings.yml")
+DIFF_LEVELS = settings["DIFF_LEVELS"]
+selected_level = settings["INITIAL_LEVEL"]
 
 while running:
     for event in pygame.event.get():
