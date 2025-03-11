@@ -100,7 +100,40 @@ DIFF_LEVELS = {
     }
 }
 
-diff_level = "MEDIUM"
+selected_level = 2
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                selected_level = (selected_level - 1) % len(DIFF_LEVELS.keys())
+            if event.key == pygame.K_DOWN:
+                selected_level = (selected_level + 1) % len(DIFF_LEVELS.keys())
+            if event.key == pygame.K_RETURN:
+                running = False
+
+    window.fill((20, 20, 20))
+
+    font_game_over = pygame.font.SysFont("Comic Sans MS", 30)
+    font_player = pygame.font.SysFont("Comic Sans MS", 30)
+
+    text_game_over = font_game_over.render(f"Select difficulty level", True, (255, 0, 0))
+    text_rect = text_game_over.get_rect(center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2))
+    window.blit(text_game_over, text_rect)
+
+    for i, level in enumerate(DIFF_LEVELS.keys()):
+        text_player = font_player.render(f"{i+1}. {level}{'<----' if i == selected_level else ''}", True, (255, 255, 255))
+        text_rect = text_game_over.get_rect(center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 75 + 30*i))
+        window.blit(text_player, text_rect)
+
+    pygame.display.flip()
+
+running = True
+
+diff_level = list(DIFF_LEVELS.keys())[selected_level]
 
 # set game speed
 diff_settings = DIFF_LEVELS[diff_level]
