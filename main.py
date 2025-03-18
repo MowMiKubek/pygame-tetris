@@ -11,8 +11,8 @@ clock = pygame.time.Clock()
 window = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
 game_screen = pygame.Surface((constants.GAME_SCREEN_WIDTH, constants.GAME_SCREEN_HEIGHT))
 
-
 score_font = pygame.font.SysFont('Arial', 36)
+
 
 def valid_move(shape, grid, offset):
     off_x, off_y = offset
@@ -25,6 +25,7 @@ def valid_move(shape, grid, offset):
                     return False
     return True
 
+
 def draw_grid(surface, grid):
     for y in range(constants.GRID_HEIGHT):
         for x in range(constants.GRID_WIDTH):
@@ -32,11 +33,13 @@ def draw_grid(surface, grid):
                 pygame.draw.rect(surface, grid[y][x], (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE,
                                                        constants.BLOCK_SIZE, constants.BLOCK_SIZE))
 
+
 def clear_lines(grid):
-    new_grid = [row for row in grid if any(cell == 0 for cell in row)] # 111101 - keep it; 111111 - discard it
+    new_grid = [row for row in grid if any(cell == 0 for cell in row)]  # 111101 - keep it; 111111 - discard it
     lines_removed = constants.GRID_HEIGHT - len(new_grid)
     new_grid = [[0 for _ in range(constants.GRID_WIDTH)] for _ in range(lines_removed)] + new_grid
     return new_grid, lines_removed
+
 
 def check_if_game_over(grid, tetromino):
     for y, row in enumerate(tetromino.shape):
@@ -52,6 +55,7 @@ def place_ghost(grid, tetromino):
     tetromino.color = (40, 40, 40)
     return tetromino
 
+
 def draw_next_tetromino(surface, tetromino, location):
     x_loc, y_loc = location
     for y, row in enumerate(tetromino.shape):
@@ -62,9 +66,10 @@ def draw_next_tetromino(surface, tetromino, location):
                                   constants.BLOCK_SIZE,
                                   constants.BLOCK_SIZE))
 
+
 def split(text):
     separator_idx = text.find(':')
-    return text[:separator_idx], text[separator_idx+1:]
+    return text[:separator_idx], text[separator_idx + 1:]
 
 
 grid = [[0 for _ in range(constants.GRID_WIDTH)] for _ in range(constants.GRID_HEIGHT)]
@@ -90,7 +95,9 @@ DEFAULT_DIFF_LEVELS = {
     "INITIAL_LEVEL": 2,
     "DIFF_LEVELS": {
         "EASY": {
-            "speed": [500, 500, 400, 350]
+            "points": [100, 200, 500, 1200],
+            "speed": [500, 500, 400, 350],
+            "score_range": [100, 200, 300]
         },
         "MEDIUM": {
             "speed": [500, 400, 300, 200],
@@ -120,8 +127,6 @@ def read_yaml_file(path):
         return DEFAULT_DIFF_LEVELS
 
 
-
-
 settings = read_yaml_file("util/settings")
 DIFF_LEVELS = settings["DIFF_LEVELS"]
 selected_level = settings["INITIAL_LEVEL"]
@@ -149,8 +154,10 @@ while running:
     window.blit(text_game_over, text_rect)
 
     for i, level in enumerate(DIFF_LEVELS.keys()):
-        text_player = font_player.render(f"{i+1}. {level}{'<----' if i == selected_level else ''}", True, (255, 255, 255))
-        text_rect = text_game_over.get_rect(center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 75 + 30*i))
+        text_player = font_player.render(f"{i + 1}. {level}{'<----' if i == selected_level else ''}", True,
+                                         (255, 255, 255))
+        text_rect = text_game_over.get_rect(
+            center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 75 + 30 * i))
         window.blit(text_player, text_rect)
 
     pygame.display.flip()
@@ -172,6 +179,16 @@ show_hint = True
 if "show_hint" in DIFF_LEVELS[diff_level].keys() and DIFF_LEVELS[diff_level]["show_hint"] == False:
     show_hint = False
 
+# points for different line count
+points = [40, 100, 300, 1200]
+if "points" in DIFF_LEVELS[diff_level].keys():
+    points = DIFF_LEVELS[diff_level]["points"]
+
+# score-speed range
+score_range = [1000, 2000, 3000]
+if "score_range" in DIFF_LEVELS[diff_level].keys():
+    score_range = DIFF_LEVELS[diff_level]["score_range"]
+
 game_score = 0
 
 while running:
@@ -179,14 +196,22 @@ while running:
     fall_time += clock.get_rawtime()
     clock.tick()
 
-    if game_score < 1000:
+    if game_score < score_range[0]:
         fall_speed = diff_settings["speed"][0]
-    elif 1000 <= game_score < 2000:
-        fall_speed = diff_settings["speed"][1]
-    elif 2000 <= game_score < 3000:
-        fall_speed = diff_settings["speed"][2]
-    else:
-        fall_speed = diff_settings["speed"][3]
+    for i in range(0, len(score_range)-1):
+        if score_range[i] <= game_score < score_range[i+1]:
+            fall_speed = diff_settings["speed"][1]
+    if game_score > score_range[-1]:
+        fall_speed = diff_settings["speed"][-1]
+
+    # if game_score < 1000:
+    #     fall_speed = diff_settings["speed"][0]
+    # elif 1000 <= game_score < 2000:
+    #     fall_speed = diff_settings["speed"][1]
+    # elif 2000 <= game_score < 3000:
+    #     fall_speed = diff_settings["speed"][2]
+    # else:
+    #     fall_speed = diff_settings["speed"][3]
 
     if fall_time >= fall_speed:
         fall_time = 0
@@ -198,15 +223,14 @@ while running:
                     if cell != 0:
                         grid[current_tetromino.y + y][current_tetromino.x + x] = current_tetromino.color
             grid, lines = clear_lines(grid)
-            print(lines)
             if lines == 1:
-                game_score += 40
+                game_score += points[0]
             elif lines == 2:
-                game_score += 100
+                game_score += points[1]
             elif lines == 3:
-                game_score += 300
+                game_score += points[2]
             elif lines == 4:
-                game_score += 1200
+                game_score += points[3]
             current_tetromino = next_tetromino
             next_tetromino = Tetromino.Tetromino(current_tetromino.shape)
             if not check_if_game_over(grid, current_tetromino):
@@ -217,14 +241,17 @@ while running:
             running = False
             pygame.quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN and valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
+            if event.key == pygame.K_DOWN and valid_move(current_tetromino.shape, grid,
+                                                         (current_tetromino.x, current_tetromino.y + 1)):
                 current_tetromino.y += 1
             if event.key == pygame.K_SPACE:
                 while valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
                     current_tetromino.y += 1
-            if event.key == pygame.K_LEFT and valid_move(current_tetromino.shape, grid, (current_tetromino.x - 1, current_tetromino.y)):
+            if event.key == pygame.K_LEFT and valid_move(current_tetromino.shape, grid,
+                                                         (current_tetromino.x - 1, current_tetromino.y)):
                 current_tetromino.x -= 1
-            if event.key == pygame.K_RIGHT and valid_move(current_tetromino.shape, grid, (current_tetromino.x + 1, current_tetromino.y)):
+            if event.key == pygame.K_RIGHT and valid_move(current_tetromino.shape, grid,
+                                                          (current_tetromino.x + 1, current_tetromino.y)):
                 current_tetromino.x += 1
             if event.key == pygame.K_UP:
                 backup_tetromino = deepcopy(current_tetromino)
@@ -251,7 +278,6 @@ while running:
 
     pygame.display.flip()
 
-
 lines = []
 places = []
 
@@ -274,11 +300,13 @@ while SCORE_ENTER:
     window.blit(text_game_over, text_rect)
 
     text_player = font_player.render(f"Your name:", True, (255, 255, 255))
-    text_rect = text_game_over.get_rect(center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 75))
+    text_rect = text_game_over.get_rect(
+        center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 75))
     window.blit(text_player, text_rect)
 
     text_player = font_player.render(f"{player_name}", True, (255, 255, 255))
-    text_rect = text_game_over.get_rect(center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 150))
+    text_rect = text_game_over.get_rect(
+        center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 150))
     window.blit(text_player, text_rect)
 
     for event in pygame.event.get():
@@ -298,8 +326,8 @@ while SCORE_ENTER:
                     lines = sorted(lines, key=lambda data: int(data[1]), reverse=True)
                     places = [1] * len(lines)
                     for i in range(1, len(lines)):
-                        if lines[i][1] == lines[i-1][1]:
-                            places[i] = places[i-1]
+                        if lines[i][1] == lines[i - 1][1]:
+                            places[i] = places[i - 1]
                         else:
                             places[i] = i + 1
                     for i, line in enumerate(lines):
@@ -311,7 +339,6 @@ while SCORE_ENTER:
 
     clock.tick()
     pygame.display.flip()
-
 
 while True:
     for event in pygame.event.get():
@@ -343,8 +370,10 @@ while True:
             break
 
     if index >= 3:
-        text_player = font_player.render(f"{places[index]}. {lines[index][0]}: {lines[index][1]}", True, (255, 255, 255))
-        text_rect = text_game_over.get_rect(center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 210))
+        text_player = font_player.render(f"{places[index]}. {lines[index][0]}: {lines[index][1]}", True,
+                                         (255, 255, 255))
+        text_rect = text_game_over.get_rect(
+            center=(constants.GAME_SCREEN_WIDTH // 2, constants.GAME_SCREEN_HEIGHT // 2 + 210))
         window.blit(text_player, text_rect)
 
     clock.tick()
