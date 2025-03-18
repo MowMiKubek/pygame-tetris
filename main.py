@@ -3,6 +3,7 @@ import pygame
 import util.constants as constants
 import util.Tetromino as Tetromino
 import yaml
+import os
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -105,12 +106,15 @@ DEFAULT_DIFF_LEVELS = {
 }
 
 
-def read_yaml_file(file_path):
+def read_yaml_file(path):
+    file_path = path + '/settings.yml'
     try:
         with open(file_path, "r") as file:
             data = yaml.safe_load(file)
         return data
     except:
+        if not os.path.isdir(path):
+            os.makedirs(path)
         with open(file_path, "w") as file:
             yaml.dump(DEFAULT_DIFF_LEVELS, file, default_flow_style=False)
         return DEFAULT_DIFF_LEVELS
@@ -118,7 +122,7 @@ def read_yaml_file(file_path):
 
 
 
-settings = read_yaml_file("settings/settings.yml")
+settings = read_yaml_file("util/settings")
 DIFF_LEVELS = settings["DIFF_LEVELS"]
 selected_level = settings["INITIAL_LEVEL"]
 
