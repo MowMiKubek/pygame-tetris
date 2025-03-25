@@ -31,7 +31,7 @@ class Tetromino:
         [[0, 1, 1], [1, 1, 0]],  # thunder
     ]
 
-    propabilities = [0.75, 1.0, 1.0, 1.5, 1.0, 2.0]
+    probabilities = [0.75, 1.0, 1.0, 1.5, 1.0, 2.0]
     shapes_count = [0, 0, 0, 0, 0, 0]
 
     def __init__(self, forbidden_shape=None):
@@ -39,7 +39,7 @@ class Tetromino:
         random_number = random.uniform(0.0, 1.0)
         prefix_sum = 0
         self.shape = Tetromino.tetrominoes[0]
-        for i, prop in enumerate(Tetromino.propabilities):
+        for i, prop in enumerate(Tetromino.probabilities):
             if random_number <= prefix_sum + prop:
                 self.shape = Tetromino.tetrominoes[i]
                 Tetromino.shapes_count[i] += 1
@@ -53,9 +53,9 @@ class Tetromino:
 
     @staticmethod
     def normalize_prop():
-        prop_sum = sum(Tetromino.propabilities)
-        for i, item in enumerate(Tetromino.propabilities):
-            Tetromino.propabilities[i] = item / prop_sum
+        prop_sum = sum(Tetromino.probabilities)
+        for i, item in enumerate(Tetromino.probabilities):
+            Tetromino.probabilities[i] = item / prop_sum
 
     def rotate(self):
         self.shape = [list(row) for row in zip(*self.shape[::-1])]

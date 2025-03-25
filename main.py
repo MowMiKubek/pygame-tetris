@@ -174,6 +174,22 @@ if "bonus_tetrominos" in DIFF_LEVELS[diff_level].keys():
     for tetromino in DIFF_LEVELS[diff_level]["bonus_tetrominos"]:
         Tetromino.Tetromino.tetrominoes.append(tetromino)
 
+# set probabilities
+if "probabilities" in DIFF_LEVELS[diff_level].keys():
+    probabilities = DIFF_LEVELS[diff_level]["probabilities"]
+    if len(probabilities) == len(Tetromino.Tetromino.tetrominoes):
+        Tetromino.Tetromino.probabilities = probabilities
+    elif len(probabilities) > len(Tetromino.Tetromino.tetrominoes):
+        Tetromino.Tetromino.probabilities = probabilities[:len(Tetromino.Tetromino.tetrominoes)]
+        print("Warning: probability count doesn't match tetromino count")
+    else:
+        for i in range(len(Tetromino.Tetromino.tetrominoes)-len(probabilities)):
+            probabilities.append(1)
+        print("Warning: probability count doesn't match tetromino count")
+else:
+    Tetromino.Tetromino.probabilities = [0] * len(Tetromino.Tetromino.tetrominoes)
+Tetromino.Tetromino.shapes_count = [0] * len(Tetromino.Tetromino.tetrominoes)
+
 # set hint
 show_hint = True
 if "show_hint" in DIFF_LEVELS[diff_level].keys() and DIFF_LEVELS[diff_level]["show_hint"] == False:
