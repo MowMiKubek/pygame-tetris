@@ -1,5 +1,7 @@
 import random
+
 import pygame
+
 # import constants
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
@@ -9,6 +11,7 @@ BLOCK_SIZE = 30
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+
 
 class Tetromino:
     COLORS = [
@@ -20,21 +23,39 @@ class Tetromino:
     ]
 
     tetrominoes = [
-        [[1, 1, 1, 1]],  # I
+        [[1, 1, 1, 1]],          # I
         [[1, 1, 1], [0, 1, 0]],  # T
         [[1, 1, 1], [1, 0, 0]],  # L
         [[1, 1, 1], [0, 0, 1]],  # J
-        [[1, 1], [1, 1]],  # O
-        [[0, 1, 1], [1, 1, 0]],
-        # [[0, 1, 0],[1, 1, 1],[0, 1, 0]]
+        [[1, 1], [1, 1]],        # O
+        [[0, 1, 1], [1, 1, 0]],  # thunder
     ]
 
+    propabilities = [0.75, 1.0, 1.0, 1.5, 1.0, 2.0]
+    shapes_count = [0, 0, 0, 0, 0, 0]
+
     def __init__(self, forbidden_shape=None):
-        self.shape = random.choice(list(filter(lambda elem: elem != forbidden_shape, Tetromino.tetrominoes)))
+        Tetromino.normalize_prop()
+        random_number = random.uniform(0.0, 1.0)
+        prefix_sum = 0
+        self.shape = Tetromino.tetrominoes[0]
+        for i, prop in enumerate(Tetromino.propabilities):
+            if random_number <= prefix_sum + prop:
+                self.shape = Tetromino.tetrominoes[i]
+                Tetromino.shapes_count[i] += 1
+                break
+            prefix_sum += prop
+
         self.color = random.choice(Tetromino.COLORS)
         self.x = GRID_WIDTH // 2 - len(self.shape[0]) // 2
         self.y = 0
         self.rotation = 0
+
+    @staticmethod
+    def normalize_prop():
+        prop_sum = sum(Tetromino.propabilities)
+        for i, item in enumerate(Tetromino.propabilities):
+            Tetromino.propabilities[i] = item / prop_sum
 
     def rotate(self):
         self.shape = [list(row) for row in zip(*self.shape[::-1])]

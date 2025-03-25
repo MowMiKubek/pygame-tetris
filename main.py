@@ -204,15 +204,6 @@ while running:
     if game_score > score_range[-1]:
         fall_speed = diff_settings["speed"][-1]
 
-    # if game_score < 1000:
-    #     fall_speed = diff_settings["speed"][0]
-    # elif 1000 <= game_score < 2000:
-    #     fall_speed = diff_settings["speed"][1]
-    # elif 2000 <= game_score < 3000:
-    #     fall_speed = diff_settings["speed"][2]
-    # else:
-    #     fall_speed = diff_settings["speed"][3]
-
     if fall_time >= fall_speed:
         fall_time = 0
         if valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
