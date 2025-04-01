@@ -1,3 +1,4 @@
+import random
 from copy import deepcopy
 import pygame
 import util.constants as constants
@@ -39,6 +40,11 @@ def clear_lines(grid):
     lines_removed = constants.GRID_HEIGHT - len(new_grid)
     new_grid = [[0 for _ in range(constants.GRID_WIDTH)] for _ in range(lines_removed)] + new_grid
     return new_grid, lines_removed
+
+
+def remove_line(grid):
+    new_grid = [[0 for _ in range(constants.GRID_WIDTH)]] + grid[:-1]
+    return new_grid
 
 
 def check_if_game_over(grid, tetromino):
@@ -206,6 +212,7 @@ if "score_range" in DIFF_LEVELS[diff_level].keys():
     score_range = DIFF_LEVELS[diff_level]["score_range"]
 
 game_score = 0
+cheat_drop_row_cooldown = random.randint(30, 40)
 
 while running:
     game_screen.fill(constants.BLACK)
@@ -223,6 +230,10 @@ while running:
     if fall_time >= fall_speed:
         fall_time = 0
         if valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
+            cheat_drop_row_cooldown -= 1
+            if cheat_drop_row_cooldown == 0:
+                grid = remove_line(grid)
+                cheat_drop_row_cooldown = random.randint(30, 40)
             current_tetromino.y += 1
         else:
             for y, row in enumerate(current_tetromino.shape):
@@ -265,6 +276,8 @@ while running:
                 current_tetromino.rotate()
                 if not valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y)):
                     current_tetromino = backup_tetromino
+            # if event.key == pygame.K_s and cheat_enabled:
+            #     grid = remove_line(grid)
 
     ghost_tetromino = deepcopy(current_tetromino)
     ghost_tetromino = place_ghost(grid, ghost_tetromino)
