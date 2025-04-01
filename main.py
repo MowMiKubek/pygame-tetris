@@ -31,8 +31,9 @@ def draw_grid(surface, grid):
     for y in range(constants.GRID_HEIGHT):
         for x in range(constants.GRID_WIDTH):
             if grid[y][x] != 0:
-                pygame.draw.rect(surface, grid[y][x], (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE,
-                                                       constants.BLOCK_SIZE, constants.BLOCK_SIZE))
+                surface.blit(Tetromino.white_easter_egg, (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE))
+                # pygame.draw.rect(surface, grid[y][x], (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE,
+                #                                        constants.BLOCK_SIZE, constants.BLOCK_SIZE))
 
 
 def clear_lines(grid):
@@ -283,7 +284,7 @@ while running:
     ghost_tetromino = place_ghost(grid, ghost_tetromino)
 
     draw_grid(game_screen, grid)
-    Tetromino.Tetromino.draw_tetromino(game_screen, ghost_tetromino)
+    Tetromino.Tetromino.draw_tetromino(game_screen, ghost_tetromino, ghost=True)
     Tetromino.Tetromino.draw_tetromino(game_screen, current_tetromino)
 
     text_score = score_font.render(f"Score: {game_score}", True, (255, 255, 255))

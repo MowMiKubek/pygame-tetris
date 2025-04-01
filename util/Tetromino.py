@@ -11,7 +11,22 @@ BLOCK_SIZE = 30
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+GRAY = (40, 40, 40)
 
+# pygame.init()
+
+easter_egg_image = pygame.image.load("./img/easter-egg.png")
+
+white_easter_egg = pygame.transform.smoothscale(easter_egg_image, (BLOCK_SIZE, BLOCK_SIZE))
+gray_easter_egg = pygame.transform.smoothscale(easter_egg_image, (BLOCK_SIZE, BLOCK_SIZE))
+
+
+for x in range(white_easter_egg.get_width()):
+    for y in range(white_easter_egg.get_height()):
+        color = white_easter_egg.get_at((x, y))
+        if color.r == 0 and color.g == 0 and color.b == 0 and color.a > 0:
+            white_easter_egg.set_at((x, y), WHITE)
+            gray_easter_egg.set_at((x, y), GRAY)
 
 class Tetromino:
     COLORS = [
@@ -34,7 +49,7 @@ class Tetromino:
     probabilities = [0.75, 1.0, 1.0, 1.5, 1.0, 2.0]
     shapes_count = [0, 0, 0, 0, 0, 0]
 
-    def __init__(self, forbidden_shape=None):
+    def __init__(self, forbidden_shape=None,):
         Tetromino.normalize_prop()
         random_number = random.uniform(0.0, 1.0)
         prefix_sum = 0
@@ -61,13 +76,16 @@ class Tetromino:
         self.shape = [list(row) for row in zip(*self.shape[::-1])]
 
     @staticmethod
-    def draw_tetromino(surface, tetromino):
+    def draw_tetromino(surface, tetromino, ghost=False):
         for y, row in enumerate(tetromino.shape):
             for x, cell in enumerate(row):
                 if cell != 0:
-                    pygame.draw.rect(surface, tetromino.color,
-                                     (
-                                         (tetromino.x + x) * BLOCK_SIZE,
-                                         (tetromino.y + y) * BLOCK_SIZE,
-                                         BLOCK_SIZE,
-                                         BLOCK_SIZE))
+                    img = gray_easter_egg if ghost else white_easter_egg
+                    surface.blit(img, ((tetromino.x + x) * BLOCK_SIZE,
+                                                    (tetromino.y + y) * BLOCK_SIZE,))
+                    # pygame.draw.rect(surface, tetromino.color,
+                    #                  (
+                    #                      (tetromino.x + x) * BLOCK_SIZE,
+                    #                      (tetromino.y + y) * BLOCK_SIZE,
+                    #                      BLOCK_SIZE,
+                    #                      BLOCK_SIZE))
