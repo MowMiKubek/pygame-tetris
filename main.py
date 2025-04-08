@@ -194,7 +194,7 @@ if "probabilities" in DIFF_LEVELS[diff_level].keys():
             probabilities.append(1)
         print("Warning: probability count doesn't match tetromino count")
 else:
-    Tetromino.Tetromino.probabilities = [0] * len(Tetromino.Tetromino.tetrominoes)
+    Tetromino.Tetromino.probabilities = [1] * len(Tetromino.Tetromino.tetrominoes)
 Tetromino.Tetromino.shapes_count = [0] * len(Tetromino.Tetromino.tetrominoes)
 
 # set hint
@@ -212,6 +212,11 @@ score_range = [1000, 2000, 3000]
 if "score_range" in DIFF_LEVELS[diff_level].keys():
     score_range = DIFF_LEVELS[diff_level]["score_range"]
 
+# speed
+speed = [500, 400, 300, 200]
+if "speed" in DIFF_LEVELS[diff_level].keys():
+    speed = DIFF_LEVELS[diff_level]["speed"]
+
 game_score = 0
 cheat_drop_row_cooldown = random.randint(30, 40)
 
@@ -221,12 +226,12 @@ while running:
     clock.tick()
 
     if game_score < score_range[0]:
-        fall_speed = diff_settings["speed"][0]
+        fall_speed = speed[0]
     for i in range(0, len(score_range)-1):
         if score_range[i] <= game_score < score_range[i+1]:
-            fall_speed = diff_settings["speed"][1]
+            fall_speed = speed[1]
     if game_score > score_range[-1]:
-        fall_speed = diff_settings["speed"][-1]
+        fall_speed = speed[-1]
 
     if fall_time >= fall_speed:
         fall_time = 0
