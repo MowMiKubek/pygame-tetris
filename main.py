@@ -165,6 +165,8 @@ while running:
                 selected_level = (selected_level + 1) % len(DIFF_LEVELS.keys())
             if event.key == pygame.K_e:
                 print("Hidden level")
+                selected_level = -1
+                running = False
             if event.key == pygame.K_RETURN:
                 running = False
 
@@ -188,19 +190,20 @@ while running:
 
 running = True
 
-diff_level = list(DIFF_LEVELS.keys())[selected_level]
-
-# set game speed
-diff_settings = DIFF_LEVELS[diff_level]
+if selected_level >= 0:
+    diff_level = list(DIFF_LEVELS.keys())[selected_level]
+    diff_settings = DIFF_LEVELS[list(DIFF_LEVELS.keys())[selected_level]]
+else:
+    diff_settings = HIDDEN_LEVEL[list(HIDDEN_LEVEL.keys())[0]]
 
 # set bonus tetrominos
-if "bonus_tetrominos" in DIFF_LEVELS[diff_level].keys():
-    for tetromino in DIFF_LEVELS[diff_level]["bonus_tetrominos"]:
+if "bonus_tetrominos" in diff_settings.keys():
+    for tetromino in diff_settings["bonus_tetrominos"]:
         Tetromino.Tetromino.tetrominoes.append(tetromino)
 
 # set probabilities
-if "probabilities" in DIFF_LEVELS[diff_level].keys():
-    probabilities = DIFF_LEVELS[diff_level]["probabilities"]
+if "probabilities" in diff_settings.keys():
+    probabilities = diff_settings["probabilities"]
     if len(probabilities) == len(Tetromino.Tetromino.tetrominoes):
         Tetromino.Tetromino.probabilities = probabilities
     elif len(probabilities) > len(Tetromino.Tetromino.tetrominoes):
@@ -216,28 +219,28 @@ Tetromino.Tetromino.shapes_count = [0] * len(Tetromino.Tetromino.tetrominoes)
 
 # set hint
 show_hint = True
-if "show_hint" in DIFF_LEVELS[diff_level].keys() and DIFF_LEVELS[diff_level]["show_hint"] == False:
+if "show_hint" in diff_settings.keys() and diff_settings["show_hint"] == False:
     show_hint = False
 
 # points for different line count
 points = [40, 100, 300, 1200]
-if "points" in DIFF_LEVELS[diff_level].keys():
-    points = DIFF_LEVELS[diff_level]["points"]
+if "points" in diff_settings.keys():
+    points = diff_settings["points"]
 
 # score-speed range
 score_range = [1000, 2000, 3000]
-if "score_range" in DIFF_LEVELS[diff_level].keys():
-    score_range = DIFF_LEVELS[diff_level]["score_range"]
+if "score_range" in diff_settings.keys():
+    score_range = diff_settings["score_range"]
 
 # speed
 speed = [500, 400, 300, 200]
-if "speed" in DIFF_LEVELS[diff_level].keys():
-    speed = DIFF_LEVELS[diff_level]["speed"]
+if "speed" in diff_settings.keys():
+    speed = diff_settings["speed"]
 
 # speed
 easter = False
-if "easter" in DIFF_LEVELS[diff_level].keys():
-    easter = DIFF_LEVELS[diff_level]["easter"]
+if "easter" in diff_settings.keys():
+    easter = diff_settings["easter"]
 
 game_score = 0
 cheat_drop_row_cooldown = random.randint(30, 40)
