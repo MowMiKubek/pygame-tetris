@@ -27,13 +27,15 @@ def valid_move(shape, grid, offset):
     return True
 
 
-def draw_grid(surface, grid):
+def draw_grid(surface, grid, easter_mode=False):
     for y in range(constants.GRID_HEIGHT):
         for x in range(constants.GRID_WIDTH):
             if grid[y][x] != 0:
-                surface.blit(Tetromino.white_easter_egg, (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE))
-                # pygame.draw.rect(surface, grid[y][x], (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE,
-                #                                        constants.BLOCK_SIZE, constants.BLOCK_SIZE))
+                if easter_mode:
+                    surface.blit(Tetromino.white_easter_egg, (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE))
+                else:
+                    pygame.draw.rect(surface, grid[y][x], (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE,
+                                                       constants.BLOCK_SIZE, constants.BLOCK_SIZE))
 
 
 def clear_lines(grid):
@@ -136,6 +138,19 @@ def read_yaml_file(path):
 
 settings = read_yaml_file("util/settings")
 DIFF_LEVELS = settings["DIFF_LEVELS"]
+
+HIDDEN_LEVEL = {
+    name: config
+    for name, config in DIFF_LEVELS.items()
+    if config.get("hidden", False) is True
+}
+
+DIFF_LEVELS = {
+    name: config
+    for name, config in DIFF_LEVELS.items()
+    if config.get("hidden", False) is False
+}
+
 selected_level = settings["INITIAL_LEVEL"]
 
 while running:
@@ -148,6 +163,8 @@ while running:
                 selected_level = (selected_level - 1) % len(DIFF_LEVELS.keys())
             if event.key == pygame.K_DOWN:
                 selected_level = (selected_level + 1) % len(DIFF_LEVELS.keys())
+            if event.key == pygame.K_e:
+                print("Hidden level")
             if event.key == pygame.K_RETURN:
                 running = False
 
@@ -217,6 +234,11 @@ speed = [500, 400, 300, 200]
 if "speed" in DIFF_LEVELS[diff_level].keys():
     speed = DIFF_LEVELS[diff_level]["speed"]
 
+# speed
+easter = False
+if "easter" in DIFF_LEVELS[diff_level].keys():
+    easter = DIFF_LEVELS[diff_level]["easter"]
+
 game_score = 0
 cheat_drop_row_cooldown = random.randint(30, 40)
 
@@ -237,7 +259,7 @@ while running:
         fall_time = 0
         if valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
             cheat_drop_row_cooldown -= 1
-            if cheat_drop_row_cooldown == 0:
+            if easter and cheat_drop_row_cooldown == 0:
                 grid = remove_line(grid)
                 cheat_drop_row_cooldown = random.randint(30, 40)
             current_tetromino.y += 1
@@ -288,9 +310,9 @@ while running:
     ghost_tetromino = deepcopy(current_tetromino)
     ghost_tetromino = place_ghost(grid, ghost_tetromino)
 
-    draw_grid(game_screen, grid)
-    Tetromino.Tetromino.draw_tetromino(game_screen, ghost_tetromino, ghost=True)
-    Tetromino.Tetromino.draw_tetromino(game_screen, current_tetromino)
+    draw_grid(game_screen, grid, easter_mode=easter)
+    Tetromino.Tetromino.draw_tetromino(game_screen, ghost_tetromino, ghost=True, easter=easter)
+    Tetromino.Tetromino.draw_tetromino(game_screen, current_tetromino, easter=easter)
 
     text_score = score_font.render(f"Score: {game_score}", True, (255, 255, 255))
     text_rect = text_score.get_rect(topleft=(0, 0))

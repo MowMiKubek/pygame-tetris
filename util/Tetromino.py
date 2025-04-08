@@ -76,16 +76,18 @@ class Tetromino:
         self.shape = [list(row) for row in zip(*self.shape[::-1])]
 
     @staticmethod
-    def draw_tetromino(surface, tetromino, ghost=False):
+    def draw_tetromino(surface, tetromino, easter=False, ghost=False):
         for y, row in enumerate(tetromino.shape):
             for x, cell in enumerate(row):
                 if cell != 0:
-                    img = gray_easter_egg if ghost else white_easter_egg
-                    surface.blit(img, ((tetromino.x + x) * BLOCK_SIZE,
-                                                    (tetromino.y + y) * BLOCK_SIZE,))
-                    # pygame.draw.rect(surface, tetromino.color,
-                    #                  (
-                    #                      (tetromino.x + x) * BLOCK_SIZE,
-                    #                      (tetromino.y + y) * BLOCK_SIZE,
-                    #                      BLOCK_SIZE,
-                    #                      BLOCK_SIZE))
+                    if easter:
+                        img = gray_easter_egg if ghost else white_easter_egg
+                        surface.blit(img, ((tetromino.x + x) * BLOCK_SIZE,
+                                    (tetromino.y + y) * BLOCK_SIZE,))
+                    else:
+                        pygame.draw.rect(surface, tetromino.color,
+                         (
+                             (tetromino.x + x) * BLOCK_SIZE,
+                             (tetromino.y + y) * BLOCK_SIZE,
+                             BLOCK_SIZE,
+                             BLOCK_SIZE))
