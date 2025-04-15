@@ -17,16 +17,6 @@ GRAY = (40, 40, 40)
 
 easter_egg_image = pygame.image.load("./img/easter-egg.png")
 
-# white_easter_egg = pygame.transform.smoothscale(easter_egg_image, (BLOCK_SIZE, BLOCK_SIZE))
-# gray_easter_egg = pygame.transform.smoothscale(easter_egg_image, (BLOCK_SIZE, BLOCK_SIZE))
-
-# easter_egg_images = {
-#     (0, 255, 255): white_easter_egg,
-#     (128, 0, 128): white_easter_egg,
-#     (255, 165, 0): white_easter_egg,
-#     (0, 0, 255): white_easter_egg,
-#     (255, 255, 0): white_easter_egg,
-# }
 
 def get_colorful_egg(color, base_image):
     colorful_egg = pygame.transform.smoothscale(base_image, (BLOCK_SIZE, BLOCK_SIZE))
@@ -36,14 +26,6 @@ def get_colorful_egg(color, base_image):
             if current_color.r == 0 and current_color.g == 0 and current_color.b == 0 and current_color.a > 0:
                 colorful_egg.set_at((x, y), color)
     return colorful_egg
-
-
-
-
-
-# white_easter_egg = get_colorful_egg(WHITE, easter_egg_image)
-# gray_easter_egg = get_colorful_egg((0, 255, 255), easter_egg_image)
-
 
 
 class Tetromino:

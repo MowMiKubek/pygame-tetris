@@ -240,10 +240,18 @@ speed = [500, 400, 300, 200]
 if "speed" in diff_settings.keys():
     speed = diff_settings["speed"]
 
-# speed
+# easter features
 easter = False
 if "easter" in diff_settings.keys():
     easter = diff_settings["easter"]
+
+easter_row = True
+if "easter_row" in diff_settings.keys():
+    easter_row = diff_settings["easter_row"]
+
+easter_eggs = True
+if "easter_eggs" in diff_settings.keys():
+    easter_eggs = diff_settings["easter_eggs"]
 
 game_score = 0
 cheat_drop_row_cooldown = random.randint(30, 40)
@@ -265,7 +273,7 @@ while running:
         fall_time = 0
         if valid_move(current_tetromino.shape, grid, (current_tetromino.x, current_tetromino.y + 1)):
             cheat_drop_row_cooldown -= 1
-            if easter and cheat_drop_row_cooldown == 0:
+            if easter and easter_row and cheat_drop_row_cooldown == 0:
                 grid = remove_line(grid)
                 cheat_drop_row_cooldown = random.randint(30, 40)
             current_tetromino.y += 1
@@ -316,9 +324,9 @@ while running:
     ghost_tetromino = deepcopy(current_tetromino)
     ghost_tetromino = place_ghost(grid, ghost_tetromino)
 
-    draw_grid(game_screen, grid, easter_mode=easter)
-    Tetromino.Tetromino.draw_tetromino(game_screen, ghost_tetromino, ghost=True, easter=easter)
-    Tetromino.Tetromino.draw_tetromino(game_screen, current_tetromino, easter=easter)
+    draw_grid(game_screen, grid, easter_mode=easter and easter_eggs)
+    Tetromino.Tetromino.draw_tetromino(game_screen, ghost_tetromino, ghost=True, easter=easter and easter_eggs)
+    Tetromino.Tetromino.draw_tetromino(game_screen, current_tetromino, easter=easter and easter_eggs)
 
     text_score = score_font.render(f"Score: {game_score}", True, (255, 255, 255))
     text_rect = text_score.get_rect(topleft=(0, 0))
@@ -327,7 +335,7 @@ while running:
 
     window.fill((20, 20, 20))
     if show_hint:
-        draw_next_tetromino(window, next_tetromino, (20, 5), easter_mode=easter)
+        draw_next_tetromino(window, next_tetromino, (20, 5), easter_mode=easter and easter_eggs)
     window.blit(game_screen, ((constants.SCREEN_WIDTH - constants.GAME_SCREEN_WIDTH) // 2, 0))
 
     pygame.display.flip()
