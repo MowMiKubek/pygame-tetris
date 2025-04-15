@@ -32,7 +32,7 @@ def draw_grid(surface, grid, easter_mode=False):
         for x in range(constants.GRID_WIDTH):
             if grid[y][x] != 0:
                 if easter_mode:
-                    surface.blit(Tetromino.white_easter_egg, (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE))
+                    surface.blit(Tetromino.Tetromino.easter_egg_images[grid[y][x]], (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE))
                 else:
                     pygame.draw.rect(surface, grid[y][x], (x * constants.BLOCK_SIZE, y * constants.BLOCK_SIZE,
                                                        constants.BLOCK_SIZE, constants.BLOCK_SIZE))
@@ -65,12 +65,15 @@ def place_ghost(grid, tetromino):
     return tetromino
 
 
-def draw_next_tetromino(surface, tetromino, location):
+def draw_next_tetromino(surface, tetromino, location, easter_mode=False):
     x_loc, y_loc = location
     for y, row in enumerate(tetromino.shape):
         for x, cell in enumerate(row):
             if cell != 0:
-                pygame.draw.rect(surface, tetromino.color,
+                if easter_mode:
+                    surface.blit(Tetromino.Tetromino.easter_egg_images[tetromino.color], ((x_loc + x) * constants.BLOCK_SIZE, (y_loc + y) * constants.BLOCK_SIZE))
+                else:
+                    pygame.draw.rect(surface, tetromino.color,
                                  ((x_loc + x) * constants.BLOCK_SIZE, (y_loc + y) * constants.BLOCK_SIZE,
                                   constants.BLOCK_SIZE,
                                   constants.BLOCK_SIZE))
@@ -219,7 +222,7 @@ Tetromino.Tetromino.shapes_count = [0] * len(Tetromino.Tetromino.tetrominoes)
 
 # set hint
 show_hint = True
-if "show_hint" in diff_settings.keys() and diff_settings["show_hint"] == False:
+if "show_hint" in diff_settings.keys() and not diff_settings["show_hint"]:
     show_hint = False
 
 # points for different line count
@@ -324,7 +327,7 @@ while running:
 
     window.fill((20, 20, 20))
     if show_hint:
-        draw_next_tetromino(window, next_tetromino, (20, 5))
+        draw_next_tetromino(window, next_tetromino, (20, 5), easter_mode=easter)
     window.blit(game_screen, ((constants.SCREEN_WIDTH - constants.GAME_SCREEN_WIDTH) // 2, 0))
 
     pygame.display.flip()
